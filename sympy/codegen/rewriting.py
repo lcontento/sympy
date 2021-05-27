@@ -158,9 +158,10 @@ logsumexp_2terms_opt = ReplaceOptim(
 
 
 def _try_expm1(expr):
-    protected, old_new =  expr.replace(exp, lambda arg: Dummy(), map=True)
+    old_new = {}
+    protected = expr.replace(exp, lambda arg: old_new.setdefault(arg, Dummy()))
     factored = protected.factor()
-    new_old = {v: k for k, v in old_new.items()}
+    new_old = {v: exp(k) for k, v in old_new.items()}
     return factored.replace(_d - 1, lambda d: expm1(new_old[d].args[0])).xreplace(new_old)
 
 
